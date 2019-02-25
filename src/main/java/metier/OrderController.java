@@ -13,16 +13,20 @@ public class OrderController {
     private final static String TEA = "Tea";
     private final static String COFFEE = "Coffee";
     private final static String CHOCOLATE = "Chocolate";
+    private final static String ORANGE_JUICE = "OrangeJuice";
 
     private final static double TEA_PRICE = 0.4;
     private final static double COFFEE_PRICE = 0.6;
     private final static double CHOCOLATE_PRICE = 0.5;
+    private final static double ORANGE_JUICE_PRICE = 0.6;
 
     private String drink;
     private double drinkPrice;
+    private String extraHotOption;
 
     //This is the method that will be called when the customer makes an order
     public boolean handleOrder(OrderPOJO orderPOJO){
+        checkDrinkCase(orderPOJO);
         if(checkIfEnoughMoneyProvided(orderPOJO)){
             formatOrder(orderPOJO);
             sendOKMessage(orderPOJO);
@@ -34,33 +38,36 @@ public class OrderController {
     }
 
     private boolean checkIfEnoughMoneyProvided(OrderPOJO orderPOJO){
-        checkDrink(orderPOJO.getDrinkType());
         return orderPOJO.getMoney() >= drinkPrice;
     }
 
     public String formatOrder(OrderPOJO orderPOJO){
         int numberOfSugars = orderPOJO.getNumberOfSugars();
-        checkDrink(orderPOJO.getDrinkType());
-        return drink+":"+checkNumberOfSugars(numberOfSugars)+":"+ checkIfStick(numberOfSugars);
+        System.out.println(drink+extraHotOption+":"+checkNumberOfSugars(numberOfSugars)+":"+ checkIfStick(numberOfSugars));
+        return drink+extraHotOption+":"+checkNumberOfSugars(numberOfSugars)+":"+ checkIfStick(numberOfSugars);
     }
 
-    private void checkDrink(String drinkType){
-        switch (drinkType) {
+    private void checkDrinkCase(OrderPOJO orderPOJO){
+        switch (orderPOJO.getDrinkType()) {
             case TEA:
-                setParameters("T",TEA_PRICE);
+                setParameters("T",TEA_PRICE, checkIfExtraHot(orderPOJO.isExtraHotOption()));
                 break;
             case COFFEE:
-                setParameters("C",COFFEE_PRICE);
+                setParameters("C",COFFEE_PRICE, checkIfExtraHot(orderPOJO.isExtraHotOption()));
                 break;
             case CHOCOLATE:
-                setParameters("H",CHOCOLATE_PRICE);
+                setParameters("H",CHOCOLATE_PRICE,checkIfExtraHot(orderPOJO.isExtraHotOption()));
+                break;
+            case ORANGE_JUICE:
+                setParameters("O",ORANGE_JUICE_PRICE, "");
                 break;
         }
     }
 
-    private void setParameters(String drink, double price){
+    private void setParameters(String drink, double price, String extraHotOption){
         this.drink = drink;
         this.drinkPrice = price;
+        this.extraHotOption = extraHotOption;
     }
 
     private String checkNumberOfSugars(int numberOfSugars){
@@ -80,14 +87,29 @@ public class OrderController {
         }
     }
 
+    private String checkIfExtraHot(boolean extraHotOption){
+        if(extraHotOption){
+            return "h";
+        }else{
+            return "";
+        }
+    }
+
     private void sendOKMessage(OrderPOJO orderPOJO){
         String stick;
+        String extraHotOption;
         if(checkIfStick(orderPOJO.getNumberOfSugars()).equals("0")){
             stick = "YES";
         }else {
             stick = "NO";
         }
-        System.out.println("Drink : "+orderPOJO.getDrinkType()+" -- Sugars : "+orderPOJO.getNumberOfSugars()+" -- Stick : "+stick);
+        if(orderPOJO.isExtraHotOption()){
+            extraHotOption = "YES";
+        }else {
+            extraHotOption = "NO";
+        }
+        System.out.println("Drink : "+orderPOJO.getDrinkType()+" -- Sugars : "+orderPOJO.getNumberOfSugars()+" -- Stick : "+stick
+        +" -- Extra Hot : "+extraHotOption);
     }
 
     private String calculateMissingMoney(double moneyProvided, double price){
