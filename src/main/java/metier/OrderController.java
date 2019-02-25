@@ -1,6 +1,8 @@
 package metier;
 
 import POJO.OrderPOJO;
+import Service.BeverageQuantityCheckerImpl;
+import Service.EmailNotifierImpl;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -24,6 +26,24 @@ public class OrderController {
     private double drinkPrice;
     private String extraHotOption;
     private ReportService reportService;
+    private BeverageQuantityCheckerImpl beverageQuantityChecker;
+    private EmailNotifierImpl emailNotifier;
+
+    public BeverageQuantityCheckerImpl getBeverageQuantityChecker() {
+        return beverageQuantityChecker;
+    }
+
+    public void setBeverageQuantityChecker(BeverageQuantityCheckerImpl beverageQuantityChecker) {
+        this.beverageQuantityChecker = beverageQuantityChecker;
+    }
+
+    public EmailNotifierImpl getEmailNotifier() {
+        return emailNotifier;
+    }
+
+    public void setEmailNotifier(EmailNotifierImpl emailNotifier) {
+        this.emailNotifier = emailNotifier;
+    }
 
     public ReportService getReportService() {
         return reportService;
@@ -35,15 +55,20 @@ public class OrderController {
 
     //This is the method that will be called when the customer makes an order
     public boolean handleOrder(OrderPOJO orderPOJO){
-        checkDrinkCase(orderPOJO);
-        if(checkIfEnoughMoneyProvided(orderPOJO)){
-            reportService.updateRepository(orderPOJO);
-            formatOrder(orderPOJO);
-            sendOKMessage(orderPOJO);
-            return true;
-        }else {
-            sendErrorMessage(calculateMissingMoney(orderPOJO.getMoney(), drinkPrice));
+        if(beverageQuantityChecker.isEmpty(orderPOJO.getDrinkType())){
+            emailNotifier.notifyMissingDrink(orderPOJO.getDrinkType());
             return false;
+        }else{
+            checkDrinkCase(orderPOJO);
+            if(checkIfEnoughMoneyProvided(orderPOJO)){
+                reportService.updateRepository(orderPOJO);
+                formatOrder(orderPOJO);
+                sendOKMessage(orderPOJO);
+                return true;
+            }else {
+                sendErrorMessage(calculateMissingMoney(orderPOJO.getMoney(), drinkPrice));
+                return false;
+            }
         }
     }
 
