@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for simple App.
@@ -25,7 +26,7 @@ public class AppTest
 
     @Test
     public void formatDrink() {
-        OrderPOJO orderPOJO = new OrderPOJO("Tea",1);
+        OrderPOJO orderPOJO = new OrderPOJO("Tea",1, 0.4);
         String formattedOrder = orderController.formatOrder(orderPOJO);
         assertEquals(formattedOrder.charAt(0),'T');
 
@@ -36,7 +37,7 @@ public class AppTest
 
     @Test
     public void formatSugar(){
-        OrderPOJO orderPOJO = new OrderPOJO("Tea",1);
+        OrderPOJO orderPOJO = new OrderPOJO("Tea",1,0.4);
         String formattedOrder = orderController.formatOrder(orderPOJO);
         assertEquals(formattedOrder.charAt(2),'1');
 
@@ -47,12 +48,26 @@ public class AppTest
 
     @Test
     public void formatStick(){
-        OrderPOJO orderPOJO = new OrderPOJO("Tea",2);
+        OrderPOJO orderPOJO = new OrderPOJO("Tea",2,0.4);
         String formattedOrder = orderController.formatOrder(orderPOJO);
         assertEquals(formattedOrder.charAt(formattedOrder.length()-1),'0');
 
         orderPOJO.setNumberOfSugars(0);
         formattedOrder = orderController.formatOrder(orderPOJO);
         assertEquals(formattedOrder.charAt(formattedOrder.length()-1),':');
+    }
+
+    @Test
+    public void enoughMoneyIsProvided(){
+        OrderPOJO orderPOJO = new OrderPOJO("Tea",2,0.4);
+        boolean controllerResponse = orderController.handleOrder(orderPOJO);
+        assertTrue(controllerResponse);
+    }
+
+    @Test
+    public void notEnoughMoneyIsProvided(){
+        OrderPOJO orderPOJO = new OrderPOJO("Tea",2,0.2);
+        boolean controllerResponse = orderController.handleOrder(orderPOJO);
+        assertTrue(!controllerResponse);
     }
 }

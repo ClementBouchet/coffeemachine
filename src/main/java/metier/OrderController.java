@@ -2,6 +2,9 @@ package metier;
 
 import POJO.OrderPOJO;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 public class OrderController {
 
     public OrderController() {
@@ -11,29 +14,53 @@ public class OrderController {
     private final static String COFFEE = "Coffee";
     private final static String CHOCOLATE = "Chocolate";
 
+    private final static double TEA_PRICE = 0.4;
+    private final static double COFFEE_PRICE = 0.6;
+    private final static double CHOCOLATE_PRICE = 0.5;
 
-    public void handleOrder(OrderPOJO orderPOJO){
-        formatOrder(orderPOJO);
-        sendMessage(orderPOJO);
+    private String drink;
+    private double drinkPrice;
+
+    //This is the method that will be called when the customer makes an order
+    public boolean handleOrder(OrderPOJO orderPOJO){
+        if(checkIfEnoughMoneyProvided(orderPOJO)){
+            formatOrder(orderPOJO);
+            sendOKMessage(orderPOJO);
+            return true;
+        }else {
+            sendErrorMessage(calculateMissingMoney(orderPOJO.getMoney(), drinkPrice));
+            return false;
+        }
+    }
+
+    private boolean checkIfEnoughMoneyProvided(OrderPOJO orderPOJO){
+        checkDrink(orderPOJO.getDrinkType());
+        return orderPOJO.getMoney() >= drinkPrice;
     }
 
     public String formatOrder(OrderPOJO orderPOJO){
-        String drinkType = orderPOJO.getDrinkType();
         int numberOfSugars = orderPOJO.getNumberOfSugars();
-        return checkDrink(drinkType)+":"+checkNumberOfSugars(numberOfSugars)+":"+ checkIfStick(numberOfSugars);
+        checkDrink(orderPOJO.getDrinkType());
+        return drink+":"+checkNumberOfSugars(numberOfSugars)+":"+ checkIfStick(numberOfSugars);
     }
 
-    private String checkDrink(String drinkType){
+    private void checkDrink(String drinkType){
         switch (drinkType) {
             case TEA:
-                return "T";
+                setParameters("T",TEA_PRICE);
+                break;
             case COFFEE:
-                return "C";
+                setParameters("C",COFFEE_PRICE);
+                break;
             case CHOCOLATE:
-                return "H";
-            default:
-                return "";
+                setParameters("H",CHOCOLATE_PRICE);
+                break;
         }
+    }
+
+    private void setParameters(String drink, double price){
+        this.drink = drink;
+        this.drinkPrice = price;
     }
 
     private String checkNumberOfSugars(int numberOfSugars){
@@ -53,14 +80,24 @@ public class OrderController {
         }
     }
 
-    public void sendMessage(OrderPOJO orderPOJO){
+    private void sendOKMessage(OrderPOJO orderPOJO){
         String stick;
-        if(checkIfStick(orderPOJO.getNumberOfSugars()) == "0"){
+        if(checkIfStick(orderPOJO.getNumberOfSugars()).equals("0")){
             stick = "YES";
         }else {
             stick = "NO";
         }
         System.out.println("Drink : "+orderPOJO.getDrinkType()+" -- Sugars : "+orderPOJO.getNumberOfSugars()+" -- Stick : "+stick);
+    }
+
+    private String calculateMissingMoney(double moneyProvided, double price){
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return df.format(price - moneyProvided);
+    }
+
+    private void sendErrorMessage(String moneyMissing){
+        System.out.println("Sorry, you need to add "+moneyMissing+" more euro");
     }
 
 }
