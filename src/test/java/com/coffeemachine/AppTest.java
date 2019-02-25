@@ -107,9 +107,9 @@ public class AppTest
         OrderPOJO orderPOJO2 = new OrderPOJO("OrangeJuice",0,0.7, false);
         OrderPOJO orderPOJO3 = new OrderPOJO("Coffee",2,0.7, false);
 
-        reportService.addDrink(orderPOJO);
-        reportService.addDrink(orderPOJO2);
-        reportService.addDrink(orderPOJO3);
+        reportService.updateRepository(orderPOJO);
+        reportService.updateRepository(orderPOJO2);
+        reportService.updateRepository(orderPOJO3);
         assertEquals(2,repository.getNumberOfOrangeJuiceSold());
     }
 
@@ -119,9 +119,9 @@ public class AppTest
         OrderPOJO orderPOJO2 = new OrderPOJO("OrangeJuice",0,0.7, false);
         OrderPOJO orderPOJO3 = new OrderPOJO("Coffee",2,0.7, false);
 
-        reportService.addAmount(orderPOJO);
-        reportService.addAmount(orderPOJO2);
-        reportService.addAmount(orderPOJO3);
+        reportService.updateRepository(orderPOJO);
+        reportService.updateRepository(orderPOJO2);
+        reportService.updateRepository(orderPOJO3);
         assertEquals(1.8,repository.getTotalAmountOfMoney(),0.01);
     }
 

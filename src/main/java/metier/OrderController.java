@@ -37,8 +37,7 @@ public class OrderController {
     public boolean handleOrder(OrderPOJO orderPOJO){
         checkDrinkCase(orderPOJO);
         if(checkIfEnoughMoneyProvided(orderPOJO)){
-            reportService.addDrink(orderPOJO);
-            reportService.addAmount(orderPOJO);
+            reportService.updateRepository(orderPOJO);
             formatOrder(orderPOJO);
             sendOKMessage(orderPOJO);
             return true;
