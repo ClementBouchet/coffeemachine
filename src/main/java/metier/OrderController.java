@@ -10,24 +10,35 @@ public class OrderController {
     public OrderController() {
     }
 
-    private final static String TEA = "Tea";
-    private final static String COFFEE = "Coffee";
-    private final static String CHOCOLATE = "Chocolate";
-    private final static String ORANGE_JUICE = "OrangeJuice";
+    public final static String TEA = "Tea";
+    public final static String COFFEE = "Coffee";
+    public final static String CHOCOLATE = "Chocolate";
+    public final static String ORANGE_JUICE = "OrangeJuice";
 
-    private final static double TEA_PRICE = 0.4;
-    private final static double COFFEE_PRICE = 0.6;
-    private final static double CHOCOLATE_PRICE = 0.5;
-    private final static double ORANGE_JUICE_PRICE = 0.6;
+    public final static double TEA_PRICE = 0.4;
+    public final static double COFFEE_PRICE = 0.6;
+    public final static double CHOCOLATE_PRICE = 0.5;
+    public final static double ORANGE_JUICE_PRICE = 0.6;
 
     private String drink;
     private double drinkPrice;
     private String extraHotOption;
+    private ReportService reportService;
+
+    public ReportService getReportService() {
+        return reportService;
+    }
+
+    public void setReportService(ReportService reportService) {
+        this.reportService = reportService;
+    }
 
     //This is the method that will be called when the customer makes an order
     public boolean handleOrder(OrderPOJO orderPOJO){
         checkDrinkCase(orderPOJO);
         if(checkIfEnoughMoneyProvided(orderPOJO)){
+            reportService.addDrink(orderPOJO);
+            reportService.addAmount(orderPOJO);
             formatOrder(orderPOJO);
             sendOKMessage(orderPOJO);
             return true;
